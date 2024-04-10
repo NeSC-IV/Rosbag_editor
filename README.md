@@ -8,4 +8,4 @@
 ## extract_jpg.py:
 * 提取图片
 ---
-### 注：rosplay前，需要rosbag reindex ***
+### 注：rosplay前，需要ros2 bag reindex ***

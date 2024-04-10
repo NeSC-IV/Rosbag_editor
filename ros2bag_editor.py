@@ -21,6 +21,8 @@ from geometry_msgs.msg import TransformStamped, TwistStamped, Transform, PoseSta
 from nav_msgs.msg import Odometry
 import yaml
 import os
+import shutil
+
 
 def imgmsg_to_cv2(img_msg):
     if img_msg.encoding != "bgr8":
@@ -48,7 +50,7 @@ class Extract():
 
     def __init__(self, path):
         # super().__init__('image_creator')
-        # self.bridge = CvBridge()
+        bridge = CvBridge()
         with open(path + '/metadata.yaml', 'r') as file:
             config = yaml.safe_load(file)
         storage_options = StorageOptions(uri=path, storage_id='sqlite3')
@@ -83,7 +85,7 @@ class Extract():
             sensor_name = topic.split('/')
             if topic == "/camera/image":
                 try:
-                    cv_image = imgmsg_to_cv2(ros_message)
+                    cv_image = bridge.imgmsg_to_cv2(ros_message)
                 except CvBridgeError as e:
                     print (e)
                 timestr = "%.9f" % (ros_message.header.stamp.sec + ros_message.header.stamp.nanosec / 1e9)
@@ -120,7 +122,7 @@ class Writebag():
     def __init__(self, src_path, bag_path):
         self.src_path = src_path
         if os.path.exists(bag_path):
-            os.system("rm -rf " + bag_path)
+            shutil.rmtree(bag_path)
         writer = rosbag2_py.SequentialWriter()
         storage_options = StorageOptions(uri=bag_path, storage_id='sqlite3')
         converter_options = ConverterOptions(input_serialization_format= 'cdr', output_serialization_format ='cdr')
